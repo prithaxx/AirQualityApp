@@ -1,0 +1,75 @@
+library(shiny)
+library(shinythemes)
+library(dplyr)
+library(tidyverse)
+data(airquality)
+
+# Define UI for app that draws a histogram ----
+ui <- fluidPage(theme = shinytheme("cerulean"),
+                
+                # navbar
+                navbarPage(
+                  "Air Quality",
+                  tabPanel("Histograms",
+                           titlePanel("Ozone"),
+                           p("This dataset allows you to filter through May 1, 1973 to
+          September 30, 1973 for mean ozone in parts per billion."),
+                           
+                           # Month Chooser: Radio buttons
+                           radioButtons("radio", label = h4("Select a month"),
+                                        choices = list("May" = 5, "June" = 6, "July" = 7,
+                                                       "August" = 8, "September" = 9), 
+                                        selected = 5),
+                           # Bins: Slider
+                           sidebarLayout(
+                             sidebarPanel(
+                               sliderInput(inputId = "bins",
+                                           label = "Number of bins:",
+                                           min = 1,
+                                           max = 50,
+                                           value = 30)
+                               
+                             ),
+                             
+                             # Main panel for displaying outputs ----
+                             mainPanel(
+                               plotOutput(outputId = "distPlot")
+                             )
+                           )
+                  ), # Ozone, tabPanel
+                ),
+)
+
+# Define server logic required to draw a histogram ----
+server <- function(input, output) {
+  
+  output$distPlot <- renderPlot({
+    month <- input$radio
+    if(month == 5){
+      month.name <- "May"
+    } else if(month == 6){
+      month.name <- "June"
+    } else if(month == 7){
+      month.name <- "July"
+    } else if(month == 8){
+      month.name <- "August"
+    } else if(month == 9){
+      month.name <- "September"
+    } 
+    
+    if(month >=5 && month <= 9){
+      x <- airquality |>
+        filter(Month == month)|>
+        select(Ozone)|>
+        na.omit(x)
+      
+      bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      hist(x$Ozone, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)", 
+           main = month.name)
+    } 
+    
+  })
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
