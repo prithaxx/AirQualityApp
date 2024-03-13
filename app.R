@@ -35,7 +35,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                  width = 6,
                  # Month Chooser: Radio buttons
                  selectInput("select", label = h4("Select constraints"), 
-                             choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3), 
+                             choices = list("Ozone" = 1, "Solar Radiation" = 2, "Wind" = 3, "Temperature" = 4), 
                              selected = 1),
                ),
           )
@@ -83,13 +83,42 @@ server <- function(input, output) {
     
     if(month >=5 && month <= 9){
       x <- airquality |>
-        filter(Month == month)|>
-        select(Ozone)|>
-        na.omit(x)
+        filter(Month == month)
       
-      bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      hist(x$Ozone, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)", 
-           main = month.name)
+      
+      constraint <- input$select
+      if(constraint == 1){
+        x <- x |>
+          select(Ozone) |>
+          na.omit(x)
+        
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        hist(x$Ozone, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)",main = month.name)
+      } 
+      else if(constraint == 2){
+        x <- x |>
+          select(Solar.R) |>
+          na.omit(x)
+        
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        hist(x$Solar.R, breaks = bins, col="skyblue", xlab="Solar Radiation",main = month.name)
+      } 
+      else if(constraint == 3){
+        x <- x |>
+          select(Wind) |>
+          na.omit(x)
+        
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        hist(x$Wind, breaks = bins, col="skyblue", xlab="Wind speed",main = month.name)
+      } 
+      else {
+        x <- x |>
+          select(Temp) |>
+          na.omit(x)
+        
+        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        hist(x$Temp, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)",main = month.name)
+      }
     } 
     
   })
