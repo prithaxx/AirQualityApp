@@ -35,7 +35,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                  width = 6,
                  # Month Chooser: Radio buttons
                  selectInput("select", label = h4("Select constraints"), 
-                             choices = list("Ozone" = 1, "Solar Radiation" = 2, "Wind" = 3, "Temperature" = 4), 
+                             choices = list("Ozone" = 1, "Solar Radiation" = 2, "Wind" = 3, "Temperature" = 4),
                              selected = 1),
                ),
           )
@@ -81,46 +81,26 @@ server <- function(input, output) {
       month.name = "September"
     } 
     
+    constraint <- input$select
+    if(constraint == 1){
+      arg = "Ozone"
+    } else if(constraint == 2){
+      arg = "Solar.R"
+    } else if(constraint == 3){
+      arg = "Wind"
+    } else if(constraint == 4){
+      arg = "Temp"
+    }
+
     if(month >=5 && month <= 9){
       x <- airquality |>
-        filter(Month == month)
-      
-      
-      constraint <- input$select
-      if(constraint == 1){
-        x <- x |>
-          select(Ozone) |>
-          na.omit(x)
-        
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        hist(x$Ozone, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)",main = month.name)
-      } 
-      else if(constraint == 2){
-        x <- x |>
-          select(Solar.R) |>
-          na.omit(x)
-        
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        hist(x$Solar.R, breaks = bins, col="skyblue", xlab="Solar Radiation",main = month.name)
-      } 
-      else if(constraint == 3){
-        x <- x |>
-          select(Wind) |>
-          na.omit(x)
-        
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        hist(x$Wind, breaks = bins, col="skyblue", xlab="Wind speed",main = month.name)
-      } 
-      else {
-        x <- x |>
-          select(Temp) |>
-          na.omit(x)
-        
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        hist(x$Temp, breaks = bins, col="skyblue", xlab="Ozone quantity (in ppb)",main = month.name)
-      }
-    } 
+        filter(Month == month) |>
+        select(arg) |>
+        na.omit()
+    }
     
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    hist(x[,1], breaks = bins, col="skyblue", xlab = arg, main=month.name)
   })
 }
 
